@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { add } from '../store/cartSlice';
 import { STATUSES, fetchProducts } from '../store/productSlice';
 
 
 const Products = () => {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const {data: products, status} = useSelector((state)=> state.product)
+    const items = useSelector((state) => state.cart);
     // const [products, setProducts] = useState([]);
 
     useEffect(()=>{
@@ -21,6 +24,12 @@ const Products = () => {
 
     const handleAdd=(product)=>{
         dispatch(add(product))
+    }
+
+    const isAddedCart=(product)=>{
+        const foundObject = items.find(item => item.id === product.id );
+        const exists = foundObject !== undefined;
+        return exists
     }
 
     if(status === STATUSES.LOADING){
@@ -38,9 +47,11 @@ const Products = () => {
                     <img src={product.image} alt="" />
                     <h4>{product.title}</h4>
                     <h5>{product.price}</h5>
-                    <button onClick={()=>handleAdd(product)} className="btn">
+                    {isAddedCart(product)? (<button onClick={()=>navigate('/cart')}  className="btn">
+                        View cart
+                    </button>):(<button onClick={()=>handleAdd(product)} className="btn">
                         Add to cart
-                    </button>
+                    </button>)}
                 </div>
             ))}
         </div>
